@@ -12,5 +12,8 @@ pipeline {
                 echo 'Hi Nani'
             }
         }
+        stage('How are you') {
+            steps {
+                echo 'How are you nani'
     }
 }
