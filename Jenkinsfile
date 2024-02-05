@@ -17,5 +17,10 @@ pipeline {
                 echo 'How are you nani'
             }
         }
+        stage('Nani') {
+            steps {
+                echo 'Nani reddy '
+            }
+        }
     }
 }
