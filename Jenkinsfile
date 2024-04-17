@@ -30,8 +30,8 @@ pipeline {
                         nexusVersion: 'nexus3',
                         protocol: 'http',
                         nexusUrl: env.NEXUS_URL,
-                        groupId: 'your.group.id',
-                        version: '1.0', // Specify your artifact version
+                        groupId: pom.GroupId,
+                        version: pom.Version, // Specify your artifact version
                         repository: 'maven-releases', // Specify your Nexus repository ID
                         credentialsId: env.NEXUS_CREDENTIAL_ID,
                         artifacts: [
