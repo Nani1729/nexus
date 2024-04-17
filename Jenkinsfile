@@ -25,20 +25,6 @@ pipeline {
                     def artifactId = pom.getArtifactId()
                     def version = pom.getVersion()
                     def packaging = pom.getPackaging()
-                    // Use Nexus Platform Plugin to upload artifacts
-                    nexusArtifactUploader(
-                        nexusVersion: 'nexus3',
-                        protocol: 'http',
-                        nexusUrl: env.NEXUS_URL,
-                        groupId: pom.GroupId,
-                        version: pom.Version, // Specify your artifact version
-                        repository: 'maven-releases', // Specify your Nexus repository ID
-                        credentialsId: env.NEXUS_CREDENTIAL_ID,
-                        artifacts: [
-                            [artifactId: artifactId, file: "target/${artifactId}-${version}.${packaging}"] // Path to your artifact
-                            // You can add more artifacts if needed
-                        ]
-                    )
                 }
             }
         }
