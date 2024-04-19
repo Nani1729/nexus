@@ -2,19 +2,15 @@ pipeline {
     agent any
     
     stages {
-        stage('Read POM') {
+        stage('Read Pom') {
             steps {
                 script {
-                    def pomContent = readFile 'pom.xml'
-                    def pom = new XmlSlurper().parseText(pomContent)
-                    
-                    println "Project Name: ${pom.artifactId.text()}"
-                    println "Project Version: ${pom.version.text()}"
-                    // You can access other attributes of the POM as needed
+                    def pomXml = readFile('pom.xml')
+                    def pom = new XmlSlurper().parseText(pomXml)
+                    def groupId = pom.groupId.text()
+                    println "GroupId: ${groupId}"
                 }
             }
         }
-        // Other stages of your pipeline
     }
-    // Post-build actions, etc.
 }
