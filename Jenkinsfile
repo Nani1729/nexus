@@ -12,12 +12,12 @@ pipeline {
         stage('Publish') {
             steps {
                 script {
-                    def pomXml = readFile('pom.xml')
-                    def pom = new XmlSlurper().parseText(pomXml)
+                    // def pomXml = readFile('pom.xml')
+                    // def pom = new XmlSlurper().parseText(pomXml)
 
-                    def groupId = pom.groupId.text()
-                    def artifactId = pom.artifactId.text()
-                    def version = pom.version.text()
+                    // def groupId = pom.groupId.text()
+                    // def artifactId = pom.artifactId.text()
+                    // def version = pom.version.text()
 
                     nexusArtifactUploader(
                         nexusVersion: 'nexus3', // Change to 'nexus2' if you're using Nexus 2
