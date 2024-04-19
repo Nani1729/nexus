@@ -1,36 +1,55 @@
 pipeline {
     agent any
-    
+    tools {
+        maven "mvn"
+    }
+    environment {
+        NEXUS_VERSION = "nexus3"
+        NEXUS_PROTOCOL = "http"
+        NEXUS_URL = "http://3.81.170.101:8081"
+        NEXUS_REPOSITORY = "java-app"
+        NEXUS_CREDENTIAL_ID = "nexus"
+    }
     stages {
-        stage('Build') {
-            steps {
-                // Your build steps here
-                // For example, Maven build
-                sh 'mvn clean package'
-            }
-        }
-        stage('Publish') {
+        stage("Maven Build") {
             steps {
                 script {
-                    // def pomXml = readFile('pom.xml')
-                    // def pom = new XmlSlurper().parseText(pomXml)
-
-                    // def groupId = pom.groupId.text()
-                    // def artifactId = pom.artifactId.text()
-                    // def version = pom.version.text()
-
-                    nexusArtifactUploader(
-                        nexusVersion: 'nexus3', // Change to 'nexus2' if you're using Nexus 2
-                        protocol: 'http', // or 'https' depending on your Nexus setup
-                        nexusUrl: 'http://3.81.170.101:8081', // URL of your Nexus server
-                        groupId: com.example,
-                        version: 1.0-SNAPSHOT,
-                        repository: 'maven-releases', // Repository ID in Nexus
-                        credentialsId: 'nexus', // ID of Jenkins credentials containing Nexus username and password/token
-                        artifacts: [
-                            [artifactId: my-web-app, type: 'jar', classifier: '', file: "target/${artifactId}-${version}.jar"]
-                        ]
-                    )
+                    sh "mvn package -DskipTests=true"
+                }
+            }
+        }
+        stage("Publish to Nexus Repository Manager") {
+            steps {
+                script {
+                    pom = readMavenPom file: "pom.xml";
+                    filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
+                    echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
+                    artifactPath = filesByGlob[0].path;
+                    artifactExists = fileExists artifactPath;
+                    if(artifactExists) {
+                        echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
+                        nexusArtifactUploader(
+                            nexusVersion: NEXUS_VERSION,
+                            protocol: NEXUS_PROTOCOL,
+                            nexusUrl: NEXUS_URL,
+                            groupId: pom.groupId,
+                            version: pom.version,
+                            repository: NEXUS_REPOSITORY,
+                            credentialsId: NEXUS_CREDENTIAL_ID,
+                            artifacts: [
+                                [artifactId: pom.artifactId,
+                                classifier: '',
+                                file: artifactPath,
+                                type: pom.packaging],
+                                [artifactId: pom.artifactId,
+                                classifier: '',
+                                file: "pom.xml",
+                                type: "pom"]
+                            ]
+                        );
+                    } else {
+                        error "*** File: ${artifactPath}, could not be found";
+                    }
                 }
             }
         }
